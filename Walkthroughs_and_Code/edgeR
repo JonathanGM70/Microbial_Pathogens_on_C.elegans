@@ -1,0 +1,4 @@
+The following link is the bioconductor page on the edgeR differential gene expression package:
+https://bioconductor.org/packages/release/bioc/html/edgeR.html
+
+The followind R scripts were used to determine differential gene expression in the E.coli OP50+N2 and P.aeruginosa + N2 groups:
