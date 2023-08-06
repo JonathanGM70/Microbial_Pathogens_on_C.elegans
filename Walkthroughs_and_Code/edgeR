@@ -2,3 +2,93 @@ The following link is the bioconductor page on the edgeR differential gene expre
 https://bioconductor.org/packages/release/bioc/html/edgeR.html
 
 The followind R scripts were used to determine differential gene expression in the E.coli OP50+N2 and P.aeruginosa + N2 groups:
+### Clears R's brain of datasets
+rm(list = ls())
+
+### Installs all needed packages
+library(edgeR)
+library(dplyr)
+library(AnnotationDbi)
+library(org.Ce.eg.db)
+
+### Reads in the featureCounts file we will be using edgeR on, and sets the EnsembleID as the rownames
+rawdata <- read.csv("FeatureCounts_A_VS_C.csv", row.names = "Geneid")
+
+### Creates a factor that contains two groups: 0 and 1 for the two treatments being tested
+group <- factor(c('0','0','0','0','0','1','1','1','1','1','1'))
+
+### Creates an DGE object based on our raw count data with each treatment being assigned to a different group
+dgeGlm <- DGEList(counts = rawdata, group = group)
+str(dgeGlm)
+
+### Gets rid of rows that have less than 4 entries and adds it to a new object 
+keep <- rowSums(cpm(dgeGlm)>2) >= 4
+
+dgeGlm <- dgeGlm[keep,]
+
+### Shows how many entries are in each of the samples
+dgeGlm[["samples"]]
+
+### Creates a model for edgeR to analyze based on the two groups previously assigned
+design <- model.matrix(~group)
+
+### This code block analyzes binomial dispersion in data and trends in dispersion for BCV and volcano plots
+dgeGlmComDisp <- estimateGLMCommonDisp(dgeGlm, design, verbose = TRUE)
+dgeGlmTrendDisp <- estimateGLMTrendedDisp(dgeGlmComDisp, design)
+dgeGlmTagDisp <- estimateGLMTagwiseDisp(dgeGlmTrendDisp, design)
+
+### Creates a BCV plot on the data
+plotBCV(dgeGlmTagDisp)
+
+### Creates an MDS plot on samples in the data
+MDS <- calcNormFactors(dgeGlm)
+plotMDS(MDS)
+
+### Performs a GLM fit with the dgeGlmTagDisp object
+fit <- glmFit(dgeGlmTagDisp, design)
+
+### This shows the number of groups being tested, with the intercept being the E.coli OP50+N2 group being used as a reference
+colnames(coef(fit))
+
+### This code block analyzes for differentially expressed genes, while being able to set Pvalue/FDR values...
+### ...in a table called hits1. The write.csv function creates the DEGs file output in your Working Directory 
+lrt1 <- glmLRT(fit, coef = 2)
+ttGlm1 <- topTags(lrt1, n = Inf)
+class(ttGlm1)
+summary(deGlm1 <- decideTestsDGE(lrt1, p = 0.05, adjust = 'fdr'))
+tagsGlm1 <- rownames(dgeGlmTagDisp)[as.logical(deGlm1)]
+hits1 <- ttGlm1$table[ttGlm1$table$FDR < 0.1,]
+write.csv(ttGlm_C, "EdgeR_A_Vs_C_Results.csv")
+
+### Loads the volcano plot package
+library(EnhancedVolcano)
+
+### Shows what dataypes are available in the C.elegans database/package
+columns(org.Ce.eg.db)
+
+### Creates a dataframe from the ttGlm1 matrix 
+ttGlm_C <- as.data.frame(ttGlm1)
+
+### Adds a new column called "symbol" that adds the gene symbol to each EnsembleID
+ttGlm_C$symbol = mapIds(org.Ce.eg.db,
+                        keys = row.names(ttGlm_C),
+                        column = "SYMBOL",
+                        keytype = "ENSEMBL",
+                        multiVals = "first")
+### Adds a new column called "name" that adds the gene description to each EnsembleID
+ttGlm_C$name = mapIds(org.Ce.eg.db,
+                      keys = row.names(ttGlm_C),
+                      column = "GENENAME",
+                      keytype = "ENSEMBL",
+                      multiVals = "first")
+
+### Creates a new table for the top 10 most differentially expressed genes in the dataset to be plotted
+topGenes <- ttGlm_C[c(1:10),]
+
+### Creates the DEGs volcano plot, it also contains several variables that can be adjusted for visual effect
+EnhancedVolcano(ttGlm_C, lab = ttGlm_C$symbol, x = 'logFC', y = 'PValue',
+                title = 'E.coli OP50+N2 Vs P.aeruginosa + N2', colAlpha = 1, pointSize = 2,
+                labSize = 5, col = c('grey','grey','grey','blue'), selectLab = topGenes$symbol,
+                drawConnectors = TRUE, boxedLabels = TRUE, legendLabSize = 12,
+                legendLabels = c('NA','NA','Not Significant','DEGs'), subtitle = 'Differentially Expressed Genes',
+                pCutoff = 0.05, gridlines.minor = FALSE, captionLabSize = 0)
