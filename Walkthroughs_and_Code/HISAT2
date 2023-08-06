@@ -1,2 +1,16 @@
 The following link is the users manual for HISAT2 containing all information on each of the different settings and arguments:
 http://daehwankimlab.github.io/hisat2/manual/
+
+The following settings were used in Cyverse to align the fastq files to the reference genome:
+maximum fragment length for valid paired-end alignments: 500
+time: false
+Report alignments tailored for transcript assemblers including StringTie: false
+Report alignments tailored specifically for Cufflinks: false
+minimum fragment length for valid paired-end alignments: 0
+Genome fasta file: Caenorhabditis_elegans.WBcel235.dna.toplevel.fa
+FASTQ Files: (All forward and reverse fastq.gz files for 28 samples are input)
+File type: PE
+New format summary file: true
+Number of threads: 4
+Minimum intron length: 20
+maximum intron length: 500000
