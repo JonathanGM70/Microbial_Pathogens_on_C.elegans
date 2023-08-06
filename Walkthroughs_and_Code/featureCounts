@@ -1,0 +1,10 @@
+The following link contains information on featureCounts and how to run it locally through the GitHub bioinformatics notebook:
+https://rnnh.github.io/bioinfo-notebook/docs/featureCounts.html
+
+The following specific featureCounts settings were used for this specific microbial pathogens C.elegans study:
+Paired end reads?: true
+Genome annotation: Caenorhabditis_elegans.WBcel235.109.gtf
+Mapped reads: (All 28 .bam files)
+Threads: 4
+Feature type: exon
+Gene attribute: gene_id
