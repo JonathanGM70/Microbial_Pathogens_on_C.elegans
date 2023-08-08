@@ -21,3 +21,9 @@
 ## Data analysis walkthroughs & code
 
 Walkthroughs and code used for all of the quality assessment and data analysis steps are available in each of the below links.
+
+1. [Quality assessment with FastQC](https://github.com/JonathanGM70/Microbial_Pathogens_on_C.elegans/blob/main/Walkthroughs_and_Code/FastQC)
+2. [Quality analysis summary with MultiQC](https://github.com/JonathanGM70/Microbial_Pathogens_on_C.elegans/blob/main/Walkthroughs_and_Code/MultiQC)
+3. [Alignment to reference genome using HISAT2](https://github.com/JonathanGM70/Microbial_Pathogens_on_C.elegans/blob/main/Walkthroughs_and_Code/HISAT2)
+4. [Aligned exonic counts with featureCounts](https://github.com/JonathanGM70/Microbial_Pathogens_on_C.elegans/blob/main/Walkthroughs_and_Code/featureCounts)
+5. [Differential expression analysis using edgeR](https://github.com/JonathanGM70/Microbial_Pathogens_on_C.elegans/blob/main/Walkthroughs_and_Code/edgeR)
